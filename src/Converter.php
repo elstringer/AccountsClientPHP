@@ -7,6 +7,7 @@
 
 namespace minecraftAccounts;
 
+use minecraftAccounts\cache\Cache;
 use minecraftAccounts\repository\NameRepository;
 use minecraftAccounts\repository\UUIDRepository;
 
@@ -16,8 +17,24 @@ use minecraftAccounts\repository\UUIDRepository;
  */
 class Converter {
 
+	/**
+	 * @var NameRepository
+	 */
 	protected static $nameRepository = null;
+
+	/**
+	 * @var UUIDRepository
+	 */
 	protected static $uuidRepository = null;
+
+	/**
+	 * @var Cache
+	 */
+	protected static $cache = null;
+
+	public static function initCache($cacheFile) {
+		self::$cache = new Cache($cacheFile);
+	}
 
 	/**
 	 * Completes a profiles. Decides whether to query for name of UUID
@@ -44,6 +61,12 @@ class Converter {
 	 * @return \minecraftAccounts\UUID
 	 */
 	public static function nameToUUID($userName) {
+		if(self::$cache !== null) {
+			$cacheEntry = self::$cache->getEntryByUserName($userName);
+			if($cacheEntry !== false)
+				return $cacheEntry->getProfile()->getUuid();
+		}
+
 		if(self::$uuidRepository === null)
 			self::$uuidRepository = new UUIDRepository();
 
@@ -56,6 +79,12 @@ class Converter {
 	 * @return string
 	 */
 	public static function uuidToName(UUID $uuid) {
+		if(self::$cache !== null) {
+			$cacheEntry = self::$cache->getEntryByUUID($uuid);
+			if($cacheEntry !== false)
+				return $cacheEntry->getProfile()->getUserName();
+		}
+
 		if(self::$nameRepository === null)
 			self::$nameRepository = new NameRepository();
 

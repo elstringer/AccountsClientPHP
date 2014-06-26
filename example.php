@@ -14,12 +14,21 @@ $player->setUserName('ozzy2345');
 
 // The Converter might throw some exceptions, catch them
 try {
-	$player = \minecraftAccounts\Converter::completeProfile($player);
+//	$player = \minecraftAccounts\Converter::completeProfile($player);
 } catch(\minecraftAccounts\AccountNotFoundException $e) {
 	echo 'This account could\'t be found.';
 } catch(InvalidArgumentException $e) {
 	echo 'You need to specify at least user name or UUID on your player.';
 }
+
+$cache = new \minecraftAccounts\cache\Cache('D:\Desktop\lista minecraft\usercache.json');
+$ozzy2345 = $cache->getEntryByUserName('ozzy2345');
+$ozzy2345->getProfile()->setUserName('ozzyfant');
+
+$ozzy2345->update();
+
+$cache->write();
+
 
 var_dump($player->getUserName()); // ozzy2345
 var_dump($player->getUuid()->getFormatted()); // c709e602-680b-4045-9dbe-00e47f3f4b4b
